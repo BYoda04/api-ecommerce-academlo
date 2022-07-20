@@ -1,6 +1,7 @@
 //models
 const { Categories } = require("../models/categories");
 const { Products } = require("../models/products");
+const { ProductsImgs } = require("../models/productsImg");
 const { Users } = require("../models/users");
 
 //utils
@@ -17,6 +18,14 @@ const productExists = catchAsync(async (req,res,next)=>{
         },
         include: [
             {
+                model: Users,
+                required: false,
+                where: {
+                    status: 'active'
+                },
+                attributes: { exclude: ['password','status'] }
+            },
+            {
                 model: Categories,
                 required: false,
                 where: {
@@ -25,12 +34,12 @@ const productExists = catchAsync(async (req,res,next)=>{
                 attributes: { exclude:'status' }
             },
             {
-                model: Users,
+                model: ProductsImgs,
                 required: false,
                 where: {
                     status: 'active'
                 },
-                attributes: { exclude: ['password','status'] }
+                attributes: { exclude: ['productId','status'] }
             }
         ]
     });

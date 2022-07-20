@@ -1,4 +1,4 @@
-const { body, validationResult } = require('express-validator');
+const { body, check, validationResult } = require('express-validator');
 const { Categories } = require('../models/categories');
 
 //utils
@@ -21,6 +21,18 @@ const checkResult = (req, res, next) => {
 
 const checkParameters =async (req,res,next)=>{
     const { categoryId } = req.body;
+	const ext = ['jpg','jpeg','png','gif','tiff','psd','bmp','webp'];
+
+	if (!req.files.length) {
+		return next(new AppError('Products need a picture',404));
+	};
+
+	req.files.map(img=>{
+		const imgExt = img.originalname.split('.').pop();
+		if (!ext.includes(imgExt)) {
+			return next(new AppError(`Invalid format ${imgExt}`,404));
+		};
+	});
 
     const category = await Categories.findOne({
         where: {

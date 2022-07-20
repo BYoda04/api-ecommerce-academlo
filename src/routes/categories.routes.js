@@ -12,11 +12,11 @@ const { categorieExists } = require('../middlewares/categories');
 
 //middleware
 
-const categoriessRouter = express.Router();
+const categoriesRouter = express.Router();
 
 //htttp://localhost:port/api/v1/products GET,POST,DELET,PUT
-categoriessRouter.post("/categories", verifyToken, categorieValidator,create);
-categoriessRouter.patch("/categories/:id", verifyToken, categorieExists,update);
-categoriessRouter.get("/categories",getItems);
+categoriesRouter.post("/categories", verifyToken, categorieValidator,create);
+categoriesRouter.patch("/categories/:id", verifyToken, categorieExists,update);
+categoriesRouter.get("/categories",getItems);
 
-module.exports = { categoriessRouter };
+module.exports = { categoriesRouter };

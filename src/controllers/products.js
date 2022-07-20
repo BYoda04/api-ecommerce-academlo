@@ -1,9 +1,10 @@
-const { ref } = require("firebase/storage");
+const { ref, uploadBytes, getDownloadURL } = require("firebase/storage");
 
 //models
 const { Products } = require("../models/products");
 const { Users } = require("../models/users");
 const { Categories } = require("../models/categories");
+const { ProductsImgs } = require("../models/productsImg");
 
 //utils
 const { catchAsync } = require("../utils/catchAsync");
@@ -15,37 +16,47 @@ const create = catchAsync(async (req,res,next)=>{
     const { userSession } = req;
     const { title,description,price,categoryId,quantity } = req.body;
 
-    // const newProduct = await Products.create({
-    //     title,
-    //     description,
-    //     price,
-    //     categoryId,
-    //     quantity,
-    //     userId: userSession.id
-    // });
+    const newProduct = await Products.create({
+        title,
+        description,
+        price,
+        categoryId,
+        quantity,
+        userId: userSession.id
+    });
 
     if (req.files.length) {
         const promises = req.files.map(async file=>{
             const ext = file.originalname.split('.').pop();
-            const ref = ref(storage, `productsImgs/${userSession.name}/file-${Date.now()}.${ext}`)
+            const imgRef = ref(storage, `productsImgs/${userSession.name}/file-${Date.now()}.${ext}`);
+            const imgRes = await uploadBytes(imgRef, file.buffer);
+            const url = await getDownloadURL(ref(storage,imgRes.metadata.fullPath));
+
+            return await ProductsImgs.create({
+                imgUrl: url,
+                productId: newProduct.id
+            });
         });
-    }
 
-    // const user = await Users.findOne({
-    //     where: {
-    //         id: userSession.id,
-    //         status: 'active'
-    //     }
-    // });
+        await Promise.all(promises);
+    };
 
-    // await user.update({
-    //     role: 'admin'
-    // });
 
-    // res.status(201).json({
-    //     status: 'success',
-    //     newProduct
-    // });
+    const user = await Users.findOne({
+        where: {
+            id: userSession.id,
+            status: 'active'
+        }
+    });
+
+    await user.update({
+        role: 'admin'
+    });
+
+    res.status(201).json({
+        status: 'success',
+        newProduct
+    });
 });
 
 const update = catchAsync(async (req,res,next)=>{
@@ -100,6 +111,14 @@ const getItems = catchAsync(async (req,res,next)=>{
         },
         include: [
             {
+                model: Users,
+                required: false,
+                where: {
+                    status: 'active'
+                },
+                attributes: { exclude: ['password','status'] }
+            },
+            {
                 model: Categories,
                 required: false,
                 where: {
@@ -108,12 +127,12 @@ const getItems = catchAsync(async (req,res,next)=>{
                 attributes: { exclude:'status' }
             },
             {
-                model: Users,
+                model: ProductsImgs,
                 required: false,
                 where: {
                     status: 'active'
                 },
-                attributes: { exclude: ['password','status'] }
+                attributes: { exclude: ['productId','status'] }
             }
         ],
         attributes: { exclude: ['categoryId','userId','status'] }
