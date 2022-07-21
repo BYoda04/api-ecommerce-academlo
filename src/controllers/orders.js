@@ -5,6 +5,7 @@ const { Orders } = require("../models/orders");
 const { Products } = require("../models/products");
 const { ProductsInCart } = require("../models/productsInCart");
 const { Users } = require("../models/users");
+const { AppError } = require("../utils/appError");
 
 //utils
 const { catchAsync } = require("../utils/catchAsync");
@@ -52,6 +53,10 @@ const getOrders = catchAsync(async (req,res,next)=>{
         ],
         attributes: { exclude: ['userId','cartid','status'] }
     });
+
+    if (!orders.length) {
+        return next(new AppError('You dont have orders',404));
+    }
 
     res.status(200).json({
         status: 'success',
