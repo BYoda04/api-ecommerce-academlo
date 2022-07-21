@@ -1,0 +1,30 @@
+extends base
+
+block emailContent
+    p.title.center.uppercase thanks for you're busisness!
+    p.subtitle.center.uppercase-first you're order
+    table.btn.btn-primary(role="presentation", border="0", cellpadding="0", cellspacing="0")
+      tbody
+        tr
+          td
+            table.content-purchases(border="0")
+              tbody
+                tr
+                  th.uppercase-first.list Name
+                  th.uppercase-first.list
+                    p Quantity
+                    p Price
+                each product in order.cart.productsInCarts
+                  tr
+                    td.uppercase-first.list #{product.product.title}
+                    td.uppercase-first.list
+                      p #{product.quantity}
+                      p $ #{product.product.price}
+                tr
+                  td.uppercase-first.total total price
+                  td.uppercase-first.total $ #{order.totalPrice}
+            table.content-back
+              tbody
+                tr
+                  td.uppercase-first
+                    a(href="https://frolicking-madeleine-39d203.netlify.app/", target="_blank") continue buying

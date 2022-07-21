@@ -14,8 +14,7 @@ const ProductsInCart = dbConnect.define('productsInCart', {
     },
     productId: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        unique:true
+        allowNull: false
     },
     quantity: {
         type: DataTypes.INTEGER,

@@ -34,7 +34,8 @@ const verifyToken = catchAsync(async (req,res,next)=>{
 		req.userSession = {
 			id: user.id,
 			role: user.role,
-			name: user.name
+			name: user.name,
+			email: user.email,
 		};
 
 		next()

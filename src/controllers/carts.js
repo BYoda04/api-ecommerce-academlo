@@ -3,10 +3,11 @@ const { Carts } = require("../models/carts");
 const { Orders } = require("../models/orders");
 const { Products } = require("../models/products");
 const { ProductsInCart } = require("../models/productsInCart");
-const { AppError } = require("../utils/appError");
 
 //utils
 const { catchAsync } = require("../utils/catchAsync");
+const { AppError } = require("../utils/appError");
+const { Email } = require("../utils/email");
 
 //controllers
 const create = catchAsync(async (req,res,next)=>{
@@ -163,7 +164,10 @@ const purchased = catchAsync(async (req,res,next)=>{
             },
         ],
         attributes: { exclude: ['userId','cartid','status'] }
-    })
+    });
+
+    //send mail
+    await new Email(userSession.email).sendSales(order);
 
     res.status(200).json({
         status: 'success',

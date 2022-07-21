@@ -9,6 +9,7 @@ const { Products } = require('../models/products');
 const { catchAsync } = require('../utils/catchAsync');
 const { AppError } = require('../utils/appError');
 const { Categories } = require('../models/categories');
+const { Email } = require('../utils/email');
 
 //controllers
 const signUp = catchAsync(async (req,res,next)=>{
@@ -24,6 +25,9 @@ const signUp = catchAsync(async (req,res,next)=>{
     });
 
     newUser.password = undefined;
+
+    //send welcome email
+    await new Email(email).sendWelcome(name);
 
     res.status(201).json({
         status: 'success',
